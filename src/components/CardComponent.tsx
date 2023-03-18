@@ -1,8 +1,6 @@
 
 
 import { useState, useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { addToCart } from '../redux/slices/cart.slice';
 import { TypeProducto } from './interface/producto.interface';
 
 import {
@@ -13,8 +11,8 @@ import {
     CardMedia,
     Typography,
   } from '@mui/material';
-import { removeGema } from '../redux/slices/validations.slice';
 
+import { useCarrito } from '../hooks/useCarrito';
 
 export const CardComponent: React.FC<TypeProducto> = ({
   imagen,
@@ -28,34 +26,23 @@ export const CardComponent: React.FC<TypeProducto> = ({
   // estado para habilitar o deshabilitar boton de agregar al carrito segun validaciones
   const [disabledBtn, setDisabledBtn] = useState<boolean>(false);
 
-  // dispatcher para actualizar variables en redux
-  const dispatch = useAppDispatch();
+  const { carrito, gemas, addProduct, removeGema } = useCarrito();
 
-  // listado de items para saber si ya lo tenemos agregado al carrito
-  const itemExist = useAppSelector((state) => state.cartReducer);
-
-  // las gemas disponibles para agregar
-  const gemas = useAppSelector((state) => state.validationReducer);
-
-  // setea el valor para saber si el boton puede estar habilitado o no validando el id
-  // o si las gemas son menos a lo que me vale el producto
   useEffect(() => {
-    setDisabledBtn(itemExist.some((item) => item.id === id) || (gemas < precio));
-  }, [itemExist, id, gemas, precio]);
+    setDisabledBtn(carrito.some((item) => item.id === id) || (gemas < precio));
+  }, [id, gemas, precio, carrito]);
 
   // funcion para agregar al carrito y remover las gemas correspondientes
   const handleAddToCart = () => {
-    dispatch(
-      addToCart({
-        id,
-        nombre,
-        categoria,
-        imagen,
-        precio,
-        descripcion
-      })
-    );
-    dispatch(removeGema(precio));
+    addProduct({
+      id,
+      nombre,
+      categoria,
+      imagen,
+      precio,
+      descripcion
+    });
+    removeGema(precio)
   };
   
   return (

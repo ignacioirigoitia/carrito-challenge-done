@@ -2,8 +2,7 @@ import React from "react";
 import { productos } from '../api/productos';
 import { Box, CircularProgress, Grid } from "@mui/material";
 import { CardComponent } from "./CardComponent";
-import { useAppSelector, useAppDispatch } from '../redux/hooks';
-import { setProductos } from '../redux/slices/products.slice';
+import { useCarrito } from '../hooks/useCarrito';
 
 
 
@@ -12,21 +11,15 @@ export const ListadoProductosComponent = () => {
   // variables para utilizar mientras cargan los productos
   const [loading, setLoading] = React.useState<boolean>(true);
 
-  // dispatcher para actualizar variables en redux
-  const dispatch = useAppDispatch();
-
-  // lista de productos a mostrar
-  const productosToShow = useAppSelector((state) => state.productReducer);
-
-  // funcion que se ejecuta unicamente si no tengo productos en redux
-  // en el caso de tener, los muestro directamente para evitar realizar la consulta nuevamente
+  const { productos: productosToShow, setProducts } = useCarrito();
   React.useEffect(() => {
     if(productosToShow.length === 0){
       setLoading(productosToShow.length === 0);
       productos
         .getAll()
         .then((resp) => {
-          dispatch( setProductos(resp.data));
+          // dispatch( setProductos(resp.data));
+          setProducts(resp.data);
           setTimeout(() => setLoading(false), 1000);
         })
         .catch((e) => {
@@ -35,7 +28,7 @@ export const ListadoProductosComponent = () => {
     } else {
       setLoading(false)
     }
-  }, [dispatch, productosToShow.length]);
+  }, [productosToShow.length, setProducts]);
 
   return (
     <div>

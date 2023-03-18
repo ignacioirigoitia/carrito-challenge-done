@@ -1,4 +1,5 @@
-import { useAppSelector } from '../redux/hooks';
+
+import { useCarrito } from '../hooks/useCarrito';
 
 type Props = {
   setState: React.Dispatch<React.SetStateAction<any>>;
@@ -6,11 +7,7 @@ type Props = {
 
 export const HeaderComponent: React.FC<Props> = ({ setState }) => {
 
-  // variable para saber cuantos items tengo en el carrito
-  const items = useAppSelector((state) => state.cartReducer);
-
-  // variable para saber cuantas gemas me quedan disponibles
-  const gemas = useAppSelector((state) => state.validationReducer);
+  const { gemas, carrito } = useCarrito();
 
   return (
     <div className="bg-stone-700 py-4 px-8 flex justify-between items-center sticky top-0 shadow-md z-10">
@@ -19,7 +16,7 @@ export const HeaderComponent: React.FC<Props> = ({ setState }) => {
         <img src="./gem.png" alt="gema" />
         <span>{gemas} Gemas</span>
       </div>
-      <button className="text-white hover:underline" onClick={setState}  >Ver Carrito ({items.length})</button>
+      <button className="text-white hover:underline" onClick={setState}  >Ver Carrito ({carrito.length})</button>
     </div>
   );
 };

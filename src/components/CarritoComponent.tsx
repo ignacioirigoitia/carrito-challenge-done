@@ -1,10 +1,9 @@
-import { useAppSelector, useAppDispatch } from '../redux/hooks';
+
 import { Button, Grid } from '@mui/material';
 import { CartItemComponent } from './CartItemComponent';
 import { useState } from 'react';
-import { restoreGemas } from '../redux/slices/validations.slice';
-import { clearCart } from '../redux/slices/cart.slice';
 import { productos } from '../api/productos';
+import { useCarrito } from '../hooks/useCarrito';
 
 type Props = {
   setState: React.Dispatch<React.SetStateAction<any>>;
@@ -13,30 +12,23 @@ type Props = {
 
 export const CarritoComponent: React.FC<Props> = ({ setState }) => {
 
-  // items del carrito
-  const items = useAppSelector((state) => state.cartReducer);
-
   // variables para tener el boton habilitado o deshabilitado
   const [disabledBtn, setDisabledBtn] = useState<boolean>(false);
 
   // variables para saber si terminamos de comprar y mostrar el mensaje
   const [buyDone, setBuyDone] = useState<boolean>(false);
 
-  // dispatcher para actualizar variables en redux
-  const dispatch = useAppDispatch();
+  const { carrito, clearCarrito } = useCarrito();
 
-  // funcion de compra, primero valido que haya items para comprar y luego realizo la compra y 
-  // refresco las variables a su estado inicial
   const handleOnSubmit = () => {
-    if(items.length > 0){
+    if(carrito.length > 0){
       const data : number[] = [];
-      for (let i = 0; i < items.length; i++) {
-        data.push(items[i].id);
+      for (let i = 0; i < carrito.length; i++) {
+        data.push(carrito[i].id);
       }
       productos.buyProduct({ "itemsId": data })
         .then(resp => {
-          dispatch( restoreGemas() );
-          dispatch( clearCart() );
+          clearCarrito()
           setBuyDone(true);
           setDisabledBtn(true);
         })
@@ -59,7 +51,7 @@ export const CarritoComponent: React.FC<Props> = ({ setState }) => {
       <Grid container columns={16}>
         <Grid item xs={16}>
           {
-            items.map((producto) => (
+            carrito.map((producto) => (
               <CartItemComponent 
                 key={producto.id}
                 nombre={producto.nombre}

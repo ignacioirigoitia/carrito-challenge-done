@@ -3,9 +3,7 @@
 
 
 import React from 'react';
-import { useAppDispatch } from '../redux/hooks';
-import { removeToCart } from '../redux/slices/cart.slice';
-import { addGema } from '../redux/slices/validations.slice';
+import { useCarrito } from '../hooks/useCarrito';
 
 
 type TypeCart = {
@@ -23,17 +21,12 @@ export const CartItemComponent: React.FC<TypeCart> = ({
   precio
 }) => {
 
-  // dispatcher para actualizar variables en redux
-  const dispatch = useAppDispatch();
+  const { removeProduct, addGema } = useCarrito();
 
   // funcion para remover del carrito un item y agrego la gema correspondiente
-  const handleRemoveCart = (id: number) => {
-    dispatch(
-      removeToCart({
-        id: id
-      })
-    );
-    dispatch(addGema(precio))
+  const handleRemoveCart = () => {
+    removeProduct(id);
+    addGema(precio);
   };
 
 
@@ -57,7 +50,7 @@ export const CartItemComponent: React.FC<TypeCart> = ({
 
     <p>{nombre}</p>
 
-    <button onClick={() => handleRemoveCart(id)} style={{ color: "grey" }} >X</button>
+    <button onClick={() => handleRemoveCart()} style={{ color: "grey" }} >X</button>
 
     </div>
   );
